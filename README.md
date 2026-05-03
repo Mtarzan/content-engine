@@ -150,3 +150,4 @@ The current publisher is a mock implementation. It logs the outgoing post and ma
 - The worker has an in-process overlap guard. For multi-instance deployments, move scheduling to a single worker process or add a distributed lock.
 - Deployment runbook: `docs/deployment.md`.
 - Live deployment: `https://content-engine.ne-xio.net/health`.
+- AI generation supports native OpenAI or any OpenAI-compatible provider by setting `OPENAI_BASE_URL`.

@@ -164,7 +164,7 @@ Expected direct bindings from this project:
 ## Deployment Record
 
 - GitHub repository: `https://github.com/Mtarzan/content-engine`
-- Current deployed commit: `b2294bd`
+- Current deployed commit: `dc45818`
 - Previous deployed archive tag: not applicable, first deployment
 - VM path: `/opt/apps/content-engine`
 - Public hostname: `https://content-engine.ne-xio.net`
@@ -173,5 +173,6 @@ Expected direct bindings from this project:
 - Cloudflare method: DNS CNAME `content-engine.ne-xio.net` to tunnel `e07558be-d261-4169-9652-6312dae218ca`, served by container `cloudflared-content-engine`
 - Local health: `curl -fsS http://127.0.0.1:3003/health`
 - Public health: `curl -fsS https://content-engine.ne-xio.net/health`
-- Deployment timestamp: `2026-05-03 15:15 UTC`
+- AI provider: OpenAI-compatible provider via `OPENAI_BASE_URL`
+- Deployment timestamp: `2026-05-03 15:40 UTC`
 - Operator: Codex
