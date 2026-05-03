@@ -25,6 +25,7 @@ SHOPIFY_ADMIN_TOKEN=
 SUPABASE_URL=
 SUPABASE_SERVICE_ROLE_KEY=
 OPENAI_API_KEY=
+OPENAI_BASE_URL=
 ADMIN_API_KEY=
 ```
 
@@ -33,6 +34,8 @@ Optional variables:
 ```bash
 PORT=3000
 OPENAI_MODEL=gpt-4o-mini
+OPENAI_REFERER=https://content-engine.ne-xio.net
+OPENAI_TITLE=Content Engine
 WORKER_ENABLED=true
 ALLOWED_ORIGINS=https://content-engine.ne-xio.net
 ```

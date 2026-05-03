@@ -16,6 +16,9 @@ This project is deployable, but deployment is not complete until the GitHub, VM,
   - `SUPABASE_URL`
   - `SUPABASE_SERVICE_ROLE_KEY`
   - `OPENAI_API_KEY`
+  - `OPENAI_BASE_URL`
+  - `OPENAI_REFERER`
+  - `OPENAI_TITLE`
   - `ADMIN_API_KEY`
   - `OPENAI_MODEL`
   - `WORKER_ENABLED`
