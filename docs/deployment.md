@@ -23,14 +23,14 @@ This project is deployable, but deployment is not complete until the GitHub, VM,
 
 ## Deployment Topology
 
-- Runtime: Docker Compose on the VM. Use `docker-compose.prod.yml` for production when Supabase Postgres is the database.
+- Runtime: Docker Compose on the VM. Use `docker-compose.yml` for the bundled Postgres deployment, or `docker-compose.prod.yml` when a Supabase Postgres `DATABASE_URL` is available.
 - API: Express app listening on container port `3000`, bound on the VM as `127.0.0.1:3003`
 - Database: Supabase Postgres through `DATABASE_URL`
 - Public access: Cloudflare proxied DNS record to the VM ingress path
 - Direct Compose port bindings are localhost-only; expose public access through Cloudflare or a local reverse proxy.
 - Scheduler: in-process cron worker enabled with `WORKER_ENABLED=true`
 
-For production, prefer Supabase Postgres and do not expose the Compose `postgres` service publicly. The included local Postgres service is bound to localhost only and is for development and fallback operation.
+For production, prefer Supabase Postgres when a `DATABASE_URL` is available. The bundled Postgres service is internal-only and is the fallback deployment path.
 
 ## Release Procedure
 
@@ -73,7 +73,7 @@ For production, prefer Supabase Postgres and do not expose the Compose `postgres
 7. Start or replace the service:
 
    ```bash
-   docker compose -f docker-compose.prod.yml up -d --build
+   docker compose up -d --build
    ```
 
    After the first clone, future VM updates can use:
@@ -105,13 +105,13 @@ For production, prefer Supabase Postgres and do not expose the Compose `postgres
 From the VM project path:
 
 ```bash
-docker compose -f docker-compose.prod.yml restart app
+docker compose restart app
 ```
 
 For a full rebuild:
 
 ```bash
-docker compose -f docker-compose.prod.yml up -d --build
+docker compose up -d --build
 ```
 
 ## Rollback Procedure
@@ -133,7 +133,7 @@ docker compose -f docker-compose.prod.yml up -d --build
 3. Recreate containers:
 
    ```bash
-   docker compose -f docker-compose.prod.yml up -d --build
+   docker compose up -d --build
    ```
 
 4. Verify:
@@ -156,7 +156,7 @@ Expected direct bindings from this project:
 
 - `127.0.0.1:3003` for the API container
 - no public `0.0.0.0:3000`
-- no public `0.0.0.0:5432`
+- no public Postgres binding
 
 ## Deployment Record
 
