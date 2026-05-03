@@ -1,7 +1,18 @@
 import { Router } from "express";
+import rateLimit from "express-rate-limit";
+import { env } from "../../config/env.js";
 import { prisma } from "../db/prisma.js";
 
 export const trackingRouter = Router();
+
+trackingRouter.use(
+  rateLimit({
+    windowMs: 60_000,
+    limit: 300,
+    standardHeaders: true,
+    legacyHeaders: false
+  })
+);
 
 trackingRouter.get("/r/:id", async (req, res, next) => {
   try {
@@ -28,7 +39,13 @@ trackingRouter.get("/r/:id", async (req, res, next) => {
       }
     });
 
-    const destination = new URL(post.product.product_url ?? "/");
+    const fallback = new URL(env.SHOPIFY_STORE_URL);
+    const destination = new URL(post.product.product_url ?? fallback.toString(), fallback);
+    if (destination.hostname !== fallback.hostname) {
+      destination.hostname = fallback.hostname;
+      destination.protocol = fallback.protocol;
+      destination.port = fallback.port;
+    }
     destination.searchParams.set("ce_post_id", post.id);
     destination.searchParams.set("utm_source", post.platform);
     destination.searchParams.set("utm_medium", "social");

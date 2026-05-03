@@ -53,8 +53,6 @@ export function createApp() {
       }
     })
   );
-  app.use(shopifyWebhookRouter);
-  app.use(express.json({ limit: "1mb" }));
   app.use(
     rateLimit({
       windowMs: 60_000,
@@ -63,6 +61,8 @@ export function createApp() {
       legacyHeaders: false
     })
   );
+  app.use(shopifyWebhookRouter);
+  app.use(express.json({ limit: "1mb" }));
   app.use(pinoHttp({ logger }));
 
   app.get("/health", async (_req, res, next) => {

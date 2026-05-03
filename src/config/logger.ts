@@ -6,8 +6,12 @@ export const logger = pino({
   redact: [
     "req.headers.authorization",
     "SHOPIFY_ADMIN_TOKEN",
+    "SHOPIFY_WEBHOOK_SECRET",
     "SUPABASE_SERVICE_ROLE_KEY",
-    "OPENAI_API_KEY"
+    "OPENAI_API_KEY",
+    "FACEBOOK_PAGE_ACCESS_TOKEN",
+    "req.headers.x-admin-api-key",
+    "req.headers.x-shopify-hmac-sha256"
   ],
   transport:
     env.NODE_ENV === "production"

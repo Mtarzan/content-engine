@@ -12,6 +12,11 @@ function assertMetaConfig() {
   }
 }
 
+async function assertMetaResponse(response: Response, action: string) {
+  if (response.ok) return;
+  throw new Error(`${action} failed with status ${response.status}`);
+}
+
 export async function publishFacebookPost(post: ContentPost): Promise<MetaPublishResponse> {
   assertMetaConfig();
 
@@ -27,9 +32,7 @@ export async function publishFacebookPost(post: ContentPost): Promise<MetaPublis
       body: params
     });
 
-    if (!response.ok) {
-      throw new Error(`Facebook photo publish failed: ${response.status} ${await response.text()}`);
-    }
+    await assertMetaResponse(response, "Facebook photo publish");
 
     return (await response.json()) as MetaPublishResponse;
   }
@@ -39,9 +42,7 @@ export async function publishFacebookPost(post: ContentPost): Promise<MetaPublis
     body: params
   });
 
-  if (!response.ok) {
-    throw new Error(`Facebook feed publish failed: ${response.status} ${await response.text()}`);
-  }
+  await assertMetaResponse(response, "Facebook feed publish");
 
   return (await response.json()) as MetaPublishResponse;
 }

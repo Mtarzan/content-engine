@@ -1,10 +1,21 @@
 import { Router, raw } from "express";
+import rateLimit from "express-rate-limit";
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { env } from "../../config/env.js";
 import { logger } from "../../config/logger.js";
 import { prisma } from "../db/prisma.js";
 
 export const shopifyWebhookRouter = Router();
+
+shopifyWebhookRouter.use(
+  "/webhooks/shopify",
+  rateLimit({
+    windowMs: 60_000,
+    limit: 60,
+    standardHeaders: true,
+    legacyHeaders: false
+  })
+);
 
 type ShopifyOrderPayload = {
   id?: number;
@@ -46,7 +57,11 @@ function findPostId(order: ShopifyOrderPayload): string | null {
 
 shopifyWebhookRouter.post("/webhooks/shopify/orders-paid", raw({ type: "application/json" }), async (req, res, next) => {
   try {
-    const body = req.body as Buffer;
+const body = req.body as Buffer;
+    if (!Buffer.isBuffer(body)) {
+      res.status(400).json({ error: "Invalid webhook body" });
+      return;
+    }
     if (!verifyShopifyHmac(body, req.header("x-shopify-hmac-sha256"))) {
       res.status(401).json({ error: "Invalid Shopify webhook signature" });
       return;

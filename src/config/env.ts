@@ -34,6 +34,18 @@ if (!parsed.success) {
   throw new Error(`Invalid environment configuration:\n${issues.join("\n")}`);
 }
 
+if (parsed.data.NODE_ENV === "production" && !parsed.data.SHOPIFY_WEBHOOK_SECRET) {
+  throw new Error("SHOPIFY_WEBHOOK_SECRET is required in production");
+}
+
+if (
+  parsed.data.NODE_ENV === "production" &&
+  parsed.data.PUBLISHER_MODE === "meta" &&
+  (!parsed.data.FACEBOOK_PAGE_ID || !parsed.data.FACEBOOK_PAGE_ACCESS_TOKEN)
+) {
+  throw new Error("FACEBOOK_PAGE_ID and FACEBOOK_PAGE_ACCESS_TOKEN are required when PUBLISHER_MODE=meta");
+}
+
 export const env = parsed.data;
 
 export const allowedOrigins = env.ALLOWED_ORIGINS.split(",")
