@@ -146,3 +146,4 @@ The current publisher is a mock implementation. It logs the outgoing post and ma
 - Shopify and OpenAI failures are logged per product so one failed product does not stop the whole worker run.
 - The worker has an in-process overlap guard. For multi-instance deployments, move scheduling to a single worker process or add a distributed lock.
 - Deployment runbook: `docs/deployment.md`.
+- Live deployment: `https://content-engine.ne-xio.net/health`.
