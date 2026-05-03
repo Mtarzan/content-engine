@@ -18,6 +18,7 @@ PORT=3000
 DATABASE_URL=postgresql://postgres:postgres@localhost:5432/content_engine?schema=public
 SHOPIFY_STORE_URL=https://example.myshopify.com
 SHOPIFY_ADMIN_TOKEN=dummy
+SHOPIFY_WEBHOOK_SECRET=dummy
 SUPABASE_URL=https://example.supabase.co
 SUPABASE_SERVICE_ROLE_KEY=dummy
 OPENAI_API_KEY=dummy
@@ -27,6 +28,10 @@ OPENAI_TITLE=Content Engine
 ADMIN_API_KEY=12345678901234567890123456789012
 ALLOWED_ORIGINS=https://content-engine.ne-xio.net
 OPENAI_MODEL=gpt-4o-mini
+PUBLISHER_MODE=mock
+META_GRAPH_VERSION=v19.0
+FACEBOOK_PAGE_ID=
+FACEBOOK_PAGE_ACCESS_TOKEN=
 WORKER_ENABLED=true
 "@ | Set-Content -LiteralPath ".env" -NoNewline
 }

@@ -3,6 +3,7 @@ import { z } from "zod";
 import { prisma } from "../db/prisma.js";
 import { runContentWorker } from "../worker/content.worker.js";
 import { getSchedulerStatus } from "../worker/scheduler.js";
+import { env } from "../../config/env.js";
 
 export const adminRouter = Router();
 
@@ -127,4 +128,20 @@ adminRouter.post("/products/:id/reset", async (req, res, next) => {
   } catch (error) {
     next(error);
   }
+});
+
+adminRouter.get("/integrations", async (_req, res) => {
+  res.json({
+    data: {
+      publisherMode: env.PUBLISHER_MODE,
+      facebook: {
+        configured: Boolean(env.FACEBOOK_PAGE_ID && env.FACEBOOK_PAGE_ACCESS_TOKEN),
+        pageId: env.FACEBOOK_PAGE_ID ? "configured" : "missing"
+      },
+      shopifyWebhooks: {
+        signatureVerification: env.SHOPIFY_WEBHOOK_SECRET ? "enabled" : "disabled",
+        ordersPaidEndpoint: `${env.OPENAI_REFERER ?? ""}/webhooks/shopify/orders-paid`
+      }
+    }
+  });
 });

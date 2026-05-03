@@ -28,7 +28,13 @@ trackingRouter.get("/r/:id", async (req, res, next) => {
       }
     });
 
-    res.redirect(post.product.product_url ?? "/");
+    const destination = new URL(post.product.product_url ?? "/");
+    destination.searchParams.set("ce_post_id", post.id);
+    destination.searchParams.set("utm_source", post.platform);
+    destination.searchParams.set("utm_medium", "social");
+    destination.searchParams.set("utm_campaign", "content_engine");
+
+    res.redirect(destination.toString());
   } catch (error) {
     next(error);
   }

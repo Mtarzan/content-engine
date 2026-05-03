@@ -13,6 +13,7 @@ This project is deployable, but deployment is not complete until the GitHub, VM,
   - `DATABASE_URL`
   - `SHOPIFY_STORE_URL`
   - `SHOPIFY_ADMIN_TOKEN`
+  - `SHOPIFY_WEBHOOK_SECRET`
   - `SUPABASE_URL`
   - `SUPABASE_SERVICE_ROLE_KEY`
   - `OPENAI_API_KEY`
@@ -23,6 +24,10 @@ This project is deployable, but deployment is not complete until the GitHub, VM,
   - `OPENAI_MODEL`
   - `WORKER_ENABLED`
   - `ALLOWED_ORIGINS`
+  - `PUBLISHER_MODE`
+  - `META_GRAPH_VERSION`
+  - `FACEBOOK_PAGE_ID`
+  - `FACEBOOK_PAGE_ACCESS_TOKEN`
 
 ## Deployment Topology
 
@@ -177,5 +182,7 @@ Expected direct bindings from this project:
 - Frontend check: `curl -fsS https://content-engine.ne-xio.net/ | grep 'Content Engine'`
 - Dashboard API check: `curl -H "x-admin-api-key: $ADMIN_API_KEY" https://content-engine.ne-xio.net/admin/overview`
 - AI provider: OpenAI-compatible provider via `OPENAI_BASE_URL`
+- Conversion attribution: Shopify orders-paid webhook at `/webhooks/shopify/orders-paid`
+- Publisher mode: configured by `PUBLISHER_MODE`
 - Deployment timestamp: `2026-05-03 15:40 UTC`
 - Operator: Codex

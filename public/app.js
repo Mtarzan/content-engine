@@ -3,7 +3,8 @@ const state = {
   status: "",
   posts: [],
   overview: null,
-  scheduler: null
+  scheduler: null,
+  integrations: null
 };
 
 const els = {
@@ -15,6 +16,7 @@ const els = {
   funnelChart: document.querySelector("#funnelChart"),
   postsList: document.querySelector("#postsList"),
   eventsList: document.querySelector("#eventsList"),
+  integrationsList: document.querySelector("#integrationsList"),
   postCount: document.querySelector("#postCount"),
   schedulerEnabled: document.querySelector("#schedulerEnabled"),
   intervalInput: document.querySelector("#intervalInput"),
@@ -176,6 +178,17 @@ function renderScheduler() {
   els.batchInput.value = state.scheduler.batch_size;
 }
 
+function renderIntegrations() {
+  const data = state.integrations;
+  if (!data) return;
+  els.integrationsList.innerHTML = `
+    <span>Publisher: ${data.publisherMode}</span>
+    <span>Facebook: ${data.facebook.configured ? "configured" : "missing"}</span>
+    <span>Shopify webhook signature: ${data.shopifyWebhooks.signatureVerification}</span>
+    <span>Orders paid: ${data.shopifyWebhooks.ordersPaidEndpoint || "/webhooks/shopify/orders-paid"}</span>
+  `;
+}
+
 function openEdit(post) {
   document.querySelector("#editId").value = post.id;
   document.querySelector("#editPlatform").value = post.platform;
@@ -248,22 +261,25 @@ async function refreshAll() {
     return;
   }
 
-  const [health, overview, posts, scheduler] = await Promise.all([
+  const [health, overview, posts, scheduler, integrations] = await Promise.all([
     fetch("/health").then((r) => r.json()),
     api("/admin/overview").then((r) => r.data),
     api(`/posts${state.status ? `?status=${state.status}` : ""}`).then((r) => r.data),
-    api("/admin/scheduler").then((r) => r.data)
+    api("/admin/scheduler").then((r) => r.data),
+    api("/admin/integrations").then((r) => r.data)
   ]);
 
   els.healthText.textContent = `API ${health.status}, DB ${health.database}`;
   state.overview = overview;
   state.posts = posts;
   state.scheduler = scheduler;
+  state.integrations = integrations;
   renderMetrics();
   renderCharts();
   renderPosts();
   renderEvents();
   renderScheduler();
+  renderIntegrations();
 }
 
 els.apiKeyInput.value = state.apiKey;

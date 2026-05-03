@@ -22,6 +22,7 @@ Required variables:
 DATABASE_URL=
 SHOPIFY_STORE_URL=
 SHOPIFY_ADMIN_TOKEN=
+SHOPIFY_WEBHOOK_SECRET=
 SUPABASE_URL=
 SUPABASE_SERVICE_ROLE_KEY=
 OPENAI_API_KEY=
@@ -38,6 +39,10 @@ OPENAI_REFERER=https://content-engine.ne-xio.net
 OPENAI_TITLE=Content Engine
 WORKER_ENABLED=true
 ALLOWED_ORIGINS=https://content-engine.ne-xio.net
+PUBLISHER_MODE=mock
+META_GRAPH_VERSION=v19.0
+FACEBOOK_PAGE_ID=
+FACEBOOK_PAGE_ACCESS_TOKEN=
 ```
 
 ## Run Locally
@@ -137,6 +142,18 @@ POST /track/:id/impression
 ```
 
 Tracking links increment clicks and redirect to the Shopify product URL when available.
+
+### Shopify Conversions
+
+```bash
+POST /webhooks/shopify/orders-paid
+```
+
+This endpoint verifies `X-Shopify-Hmac-Sha256` when `SHOPIFY_WEBHOOK_SECRET` is set. Orders are attributed when Shopify payload fields such as `landing_site`, `referring_site`, or `note_attributes` include `ce_post_id`.
+
+### Publisher Modes
+
+`PUBLISHER_MODE=mock` logs and marks posts as posted. `PUBLISHER_MODE=meta` publishes Facebook posts through the Meta Graph API when `FACEBOOK_PAGE_ID` and `FACEBOOK_PAGE_ACCESS_TOKEN` are configured. Unsupported platforms remain mock-published until their provider adapters are added.
 
 ## Database Models
 

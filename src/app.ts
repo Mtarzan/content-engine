@@ -13,6 +13,7 @@ import { adminRouter } from "./modules/admin/admin.routes.js";
 import { prisma } from "./modules/db/prisma.js";
 import { postsRouter } from "./modules/posts/posts.routes.js";
 import { trackingRouter } from "./modules/tracking/tracking.routes.js";
+import { shopifyWebhookRouter } from "./modules/webhooks/shopify.webhooks.js";
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 const publicDir = path.resolve(dirname, "../public");
@@ -52,6 +53,7 @@ export function createApp() {
       }
     })
   );
+  app.use(shopifyWebhookRouter);
   app.use(express.json({ limit: "1mb" }));
   app.use(
     rateLimit({
