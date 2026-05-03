@@ -164,7 +164,7 @@ Expected direct bindings from this project:
 ## Deployment Record
 
 - GitHub repository: `https://github.com/Mtarzan/content-engine`
-- Current deployed commit: `dc45818`
+- Current deployed commit: `7bcb70c`
 - Previous deployed archive tag: not applicable, first deployment
 - VM path: `/opt/apps/content-engine`
 - Public hostname: `https://content-engine.ne-xio.net`
@@ -175,6 +175,7 @@ Expected direct bindings from this project:
 - Local health: `curl -fsS http://127.0.0.1:3003/health`
 - Public health: `curl -fsS https://content-engine.ne-xio.net/health`
 - Frontend check: `curl -fsS https://content-engine.ne-xio.net/ | grep 'Content Engine'`
+- Dashboard API check: `curl -H "x-admin-api-key: $ADMIN_API_KEY" https://content-engine.ne-xio.net/admin/overview`
 - AI provider: OpenAI-compatible provider via `OPENAI_BASE_URL`
 - Deployment timestamp: `2026-05-03 15:40 UTC`
 - Operator: Codex
