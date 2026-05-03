@@ -95,6 +95,14 @@ npm run worker
 
 ## API
 
+### Dashboard
+
+```bash
+GET /
+```
+
+Serves the operator dashboard for generated posts, media previews, metrics, scheduler control, editing, and publishing. Enter `ADMIN_API_KEY` in the dashboard to load protected data.
+
 ### Health
 
 ```bash
@@ -120,6 +128,15 @@ X-Admin-Api-Key: <ADMIN_API_KEY>
 ```
 
 The current publisher is a mock implementation. It logs the outgoing post and marks it as `posted`. The module boundary is ready for Meta and TikTok API clients.
+
+### Tracking
+
+```bash
+GET /r/:id
+POST /track/:id/impression
+```
+
+Tracking links increment clicks and redirect to the Shopify product URL when available.
 
 ## Database Models
 
@@ -151,3 +168,4 @@ The current publisher is a mock implementation. It logs the outgoing post and ma
 - Deployment runbook: `docs/deployment.md`.
 - Live deployment: `https://content-engine.ne-xio.net/health`.
 - AI generation supports native OpenAI or any OpenAI-compatible provider by setting `OPENAI_BASE_URL`.
+- Operator dashboard: `https://content-engine.ne-xio.net/`.

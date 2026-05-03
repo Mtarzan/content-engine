@@ -3,14 +3,14 @@ import { prisma } from "../db/prisma.js";
 import { generateContent } from "../ai/ai.service.js";
 import { syncShopifyProducts } from "../shopify/shopify.service.js";
 
-export async function runContentWorker(): Promise<void> {
+export async function runContentWorker(batchSize = 25): Promise<void> {
   logger.info("Content worker run started");
   const syncedCount = await syncShopifyProducts();
 
   const products = await prisma.product.findMany({
     where: { processed: false },
     orderBy: { created_at: "asc" },
-    take: 25
+    take: batchSize
   });
 
   for (const product of products) {
@@ -24,6 +24,7 @@ export async function runContentWorker(): Promise<void> {
             platform: post.platform,
             caption: `${post.hook}\n\n${post.caption}\n\n${post.cta}`,
             image_url: product.image_url,
+            asset_type: product.image_url ? "image" : "text",
             status: "pending"
           }))
         });

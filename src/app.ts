@@ -2,20 +2,39 @@ import cors from "cors";
 import express from "express";
 import rateLimit from "express-rate-limit";
 import helmet from "helmet";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { pinoHttp } from "pino-http";
 import { ZodError } from "zod";
 import { allowedOrigins, env } from "./config/env.js";
 import { logger } from "./config/logger.js";
 import { requireAdminApiKey } from "./middleware/adminAuth.js";
+import { adminRouter } from "./modules/admin/admin.routes.js";
 import { prisma } from "./modules/db/prisma.js";
 import { postsRouter } from "./modules/posts/posts.routes.js";
+import { trackingRouter } from "./modules/tracking/tracking.routes.js";
+
+const dirname = path.dirname(fileURLToPath(import.meta.url));
+const publicDir = path.resolve(dirname, "../public");
 
 export function createApp() {
   const app = express();
 
   app.disable("x-powered-by");
   app.set("trust proxy", 1);
-  app.use(helmet());
+  app.use(
+    helmet({
+      contentSecurityPolicy: {
+        directives: {
+          defaultSrc: ["'self'"],
+          imgSrc: ["'self'", "data:", "https:"],
+          scriptSrc: ["'self'"],
+          styleSrc: ["'self'", "'unsafe-inline'"],
+          connectSrc: ["'self'"]
+        }
+      }
+    })
+  );
   app.use(
     cors({
       origin(origin, callback) {
@@ -53,6 +72,9 @@ export function createApp() {
     }
   });
 
+  app.use(express.static(publicDir));
+  app.use(trackingRouter);
+  app.use("/admin", requireAdminApiKey, adminRouter);
   app.use("/posts", requireAdminApiKey, postsRouter);
 
   app.use((_req, res) => {

@@ -9,6 +9,20 @@ const statusQuerySchema = z.object({
   status: z.enum(["pending", "posted"]).optional()
 });
 
+const updatePostSchema = z.object({
+  platform: z.string().min(1).max(40).optional(),
+  caption: z.string().min(1).max(4000).optional(),
+  image_url: z.string().url().nullable().optional(),
+  asset_type: z.enum(["text", "image", "video"]).optional(),
+  status: z.enum(["pending", "posted"]).optional(),
+  scheduled_for: z.string().datetime().nullable().optional(),
+  impressions: z.coerce.number().int().min(0).optional(),
+  clicks: z.coerce.number().int().min(0).optional(),
+  conversions: z.coerce.number().int().min(0).optional(),
+  spend: z.coerce.number().min(0).optional(),
+  revenue: z.coerce.number().min(0).optional()
+});
+
 postsRouter.get("/", async (req, res, next) => {
   try {
     const query = statusQuerySchema.parse(req.query);
@@ -20,13 +34,48 @@ postsRouter.get("/", async (req, res, next) => {
           select: {
             id: true,
             title: true,
-            price: true
+            price: true,
+            image_url: true,
+            product_url: true
           }
         }
       }
     });
 
     res.json({ data: posts });
+  } catch (error) {
+    next(error);
+  }
+});
+
+postsRouter.patch("/:id", async (req, res, next) => {
+  try {
+    const data = updatePostSchema.parse(req.body);
+    const updated = await prisma.contentPost.update({
+      where: { id: req.params.id },
+      data: {
+        ...data,
+        scheduled_for:
+          data.scheduled_for === undefined
+            ? undefined
+            : data.scheduled_for
+              ? new Date(data.scheduled_for)
+              : null
+      },
+      include: {
+        product: {
+          select: {
+            id: true,
+            title: true,
+            price: true,
+            image_url: true,
+            product_url: true
+          }
+        }
+      }
+    });
+
+    res.json({ data: updated });
   } catch (error) {
     next(error);
   }

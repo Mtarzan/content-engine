@@ -21,7 +21,19 @@ export async function publishPost(post: ContentPost): Promise<PublishResult> {
 
   const updated = await prisma.contentPost.update({
     where: { id: post.id },
-    data: { status: "posted" }
+    data: {
+      status: "posted",
+      published_at: new Date(),
+      events: {
+        create: {
+          event_type: "published",
+          metadata: {
+            provider: "mock",
+            platform: post.platform
+          }
+        }
+      }
+    }
   });
 
   return {

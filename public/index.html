@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Content Engine</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div>
+        <h1>Content Engine</h1>
+        <p id="healthText">Checking service...</p>
+      </div>
+      <div class="auth">
+        <input id="apiKeyInput" type="password" autocomplete="off" placeholder="Admin API key" />
+        <button id="saveKeyButton" type="button">Connect</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="toolbar">
+        <div class="scheduler">
+          <label>
+            <span>Worker</span>
+            <select id="schedulerEnabled">
+              <option value="true">Enabled</option>
+              <option value="false">Paused</option>
+            </select>
+          </label>
+          <label>
+            <span>Every minutes</span>
+            <input id="intervalInput" type="number" min="5" max="1440" step="5" />
+          </label>
+          <label>
+            <span>Batch size</span>
+            <input id="batchInput" type="number" min="1" max="100" />
+          </label>
+          <button id="saveSchedulerButton" type="button">Save Scheduler</button>
+          <button id="runWorkerButton" type="button">Run Now</button>
+        </div>
+        <div class="filters">
+          <button class="filter-button active" data-status="">All</button>
+          <button class="filter-button" data-status="pending">Pending</button>
+          <button class="filter-button" data-status="posted">Posted</button>
+        </div>
+      </section>
+
+      <section class="metrics" id="metricsGrid"></section>
+
+      <section class="analytics">
+        <div class="panel">
+          <div class="panel-head">
+            <h2>Platform Mix</h2>
+          </div>
+          <canvas id="platformChart" width="560" height="240"></canvas>
+        </div>
+        <div class="panel">
+          <div class="panel-head">
+            <h2>Funnel</h2>
+          </div>
+          <canvas id="funnelChart" width="560" height="240"></canvas>
+        </div>
+      </section>
+
+      <section class="content-grid">
+        <div class="panel posts-panel">
+          <div class="panel-head">
+            <h2>Generated Posts</h2>
+            <span id="postCount"></span>
+          </div>
+          <div id="postsList" class="posts-list"></div>
+        </div>
+        <aside class="panel">
+          <div class="panel-head">
+            <h2>Activity</h2>
+          </div>
+          <div id="eventsList" class="events-list"></div>
+        </aside>
+      </section>
+    </main>
+
+    <dialog id="editDialog">
+      <form method="dialog" class="edit-form">
+        <header>
+          <h2>Edit Post</h2>
+          <button value="cancel" type="submit">Close</button>
+        </header>
+        <input id="editId" type="hidden" />
+        <label>
+          <span>Platform</span>
+          <input id="editPlatform" />
+        </label>
+        <label>
+          <span>Asset Type</span>
+          <select id="editAssetType">
+            <option value="text">Text</option>
+            <option value="image">Image</option>
+            <option value="video">Video</option>
+          </select>
+        </label>
+        <label>
+          <span>Image or Video URL</span>
+          <input id="editImageUrl" />
+        </label>
+        <label>
+          <span>Caption</span>
+          <textarea id="editCaption" rows="8"></textarea>
+        </label>
+        <div class="edit-grid">
+          <label><span>Impressions</span><input id="editImpressions" type="number" min="0" /></label>
+          <label><span>Clicks</span><input id="editClicks" type="number" min="0" /></label>
+          <label><span>Conversions</span><input id="editConversions" type="number" min="0" /></label>
+          <label><span>Spend</span><input id="editSpend" type="number" min="0" step="0.01" /></label>
+          <label><span>Revenue</span><input id="editRevenue" type="number" min="0" step="0.01" /></label>
+        </div>
+        <footer>
+          <button id="savePostButton" value="default" type="button">Save Changes</button>
+        </footer>
+      </form>
+    </dialog>
+
+    <template id="postTemplate">
+      <article class="post-row">
+        <div class="asset"></div>
+        <div class="post-body">
+          <div class="post-meta"></div>
+          <h3></h3>
+          <p></p>
+          <div class="post-stats"></div>
+          <div class="post-actions">
+            <a class="tracking-link" target="_blank" rel="noreferrer">Tracking Link</a>
+            <button class="edit-button" type="button">Edit</button>
+            <button class="publish-button" type="button">Publish</button>
+          </div>
+        </div>
+      </article>
+    </template>
+
+    <script src="/app.js"></script>
+  </body>
+</html>

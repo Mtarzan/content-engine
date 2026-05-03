@@ -168,11 +168,13 @@ Expected direct bindings from this project:
 - Previous deployed archive tag: not applicable, first deployment
 - VM path: `/opt/apps/content-engine`
 - Public hostname: `https://content-engine.ne-xio.net`
+- Operator dashboard: `https://content-engine.ne-xio.net/`
 - Restart method: `cd /opt/apps/content-engine && docker compose restart app`
 - Archive method: first deployment has no previous archive; future deployments use `archive/content-engine-YYYYMMDD-HHMM`
 - Cloudflare method: DNS CNAME `content-engine.ne-xio.net` to tunnel `e07558be-d261-4169-9652-6312dae218ca`, served by container `cloudflared-content-engine`
 - Local health: `curl -fsS http://127.0.0.1:3003/health`
 - Public health: `curl -fsS https://content-engine.ne-xio.net/health`
+- Frontend check: `curl -fsS https://content-engine.ne-xio.net/ | grep 'Content Engine'`
 - AI provider: OpenAI-compatible provider via `OPENAI_BASE_URL`
 - Deployment timestamp: `2026-05-03 15:40 UTC`
 - Operator: Codex

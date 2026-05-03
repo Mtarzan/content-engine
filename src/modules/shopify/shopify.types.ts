@@ -1,6 +1,7 @@
 export type ShopifyProduct = {
   id: number;
   title: string;
+  handle: string;
   body_html: string | null;
   variants: Array<{
     price: string;

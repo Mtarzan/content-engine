@@ -13,6 +13,7 @@ model Product {
   description String
   price       Decimal       @db.Decimal(12, 2)
   image_url   String?
+  product_url String?
   processed   Boolean       @default(false)
   posts       ContentPost[]
   created_at  DateTime      @default(now())
@@ -25,17 +26,50 @@ model ContentPost {
   platform   String
   caption    String
   image_url  String?
+  asset_type String            @default("image")
   status     ContentPostStatus @default(pending)
+  scheduled_for DateTime?
+  published_at DateTime?
+  impressions Int              @default(0)
+  clicks      Int              @default(0)
+  conversions Int              @default(0)
+  spend       Decimal          @default(0) @db.Decimal(12, 2)
+  revenue     Decimal          @default(0) @db.Decimal(12, 2)
   created_at DateTime          @default(now())
   updated_at DateTime          @updatedAt
 
   product Product @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  events  PostEvent[]
 
   @@index([status])
   @@index([product_id])
+  @@index([platform])
+  @@index([created_at])
 }
 
 enum ContentPostStatus {
   pending
   posted
+}
+
+model PostEvent {
+  id         String   @id @default(cuid())
+  post_id    String
+  event_type String
+  metadata   Json?
+  created_at DateTime @default(now())
+
+  post ContentPost @relation(fields: [post_id], references: [id], onDelete: Cascade)
+
+  @@index([post_id])
+  @@index([event_type])
+  @@index([created_at])
+}
+
+model SchedulerSetting {
+  id               String   @id @default("default")
+  enabled          Boolean  @default(true)
+  interval_minutes Int      @default(30)
+  batch_size        Int      @default(25)
+  updated_at        DateTime @updatedAt
 }

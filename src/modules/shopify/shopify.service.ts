@@ -54,13 +54,15 @@ export async function syncShopifyProducts(): Promise<number> {
         title: product.title,
         description: stripHtml(product.body_html),
         price: new Prisma.Decimal(firstVariant?.price ?? "0"),
-        image_url: firstImage?.src ?? null
+        image_url: firstImage?.src ?? null,
+        product_url: `${env.SHOPIFY_STORE_URL.replace(/\/$/, "")}/products/${product.handle}`
       },
       update: {
         title: product.title,
         description: stripHtml(product.body_html),
         price: new Prisma.Decimal(firstVariant?.price ?? "0"),
-        image_url: firstImage?.src ?? null
+        image_url: firstImage?.src ?? null,
+        product_url: `${env.SHOPIFY_STORE_URL.replace(/\/$/, "")}/products/${product.handle}`
       }
     });
   }
