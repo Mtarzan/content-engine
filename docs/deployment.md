@@ -169,7 +169,7 @@ Expected direct bindings from this project:
 ## Deployment Record
 
 - GitHub repository: `https://github.com/Mtarzan/content-engine`
-- Current deployed commit: `e2e6774`
+- Current deployed commit: `a5a5e5e`
 - Previous deployed archive tag: not applicable, first deployment
 - VM path: `/opt/apps/content-engine`
 - Public hostname: `https://content-engine.ne-xio.net`
@@ -184,6 +184,7 @@ Expected direct bindings from this project:
 - AI provider: OpenAI-compatible provider via `OPENAI_BASE_URL`
 - Conversion attribution: Shopify orders-paid webhook at `/webhooks/shopify/orders-paid`
 - Conversion verification: signed Shopify webhook attributed a test order to a generated post
+- Security verification: invalid Shopify webhook HMAC returns 401; tracking redirect stays on Shopify host
 - Publisher mode: `mock`; Meta Facebook credentials are configured and can be enabled with `PUBLISHER_MODE=meta`
 - Deployment timestamp: `2026-05-03 15:40 UTC`
 - Operator: Codex
