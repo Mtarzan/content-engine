@@ -1,7 +1,9 @@
 const state = {
   apiKey: localStorage.getItem("contentEngineApiKey") || "",
   status: "",
+  imageStatus: "pending",
   posts: [],
+  images: [],
   overview: null,
   scheduler: null,
   integrations: null
@@ -23,7 +25,9 @@ const els = {
   batchInput: document.querySelector("#batchInput"),
   saveSchedulerButton: document.querySelector("#saveSchedulerButton"),
   runWorkerButton: document.querySelector("#runWorkerButton"),
-  editDialog: document.querySelector("#editDialog")
+  editDialog: document.querySelector("#editDialog"),
+  imageGrid: document.querySelector("#imageGrid"),
+  imageCount: document.querySelector("#imageCount")
 };
 
 const fmt = new Intl.NumberFormat("en-US");
@@ -255,18 +259,83 @@ async function runWorker() {
   }
 }
 
+const TYPE_BADGE = { lifestyle: "#0f766e", mirror: "#7c3aed", closeup: "#b45309", context: "#1d4ed8", clean: "#374151" };
+
+function renderImages() {
+  const images = state.images;
+  els.imageCount.textContent = `${images.length} shown`;
+  if (!images.length) {
+    els.imageGrid.innerHTML = `<div class="empty">No images match this filter.</div>`;
+    return;
+  }
+  els.imageGrid.innerHTML = images.map((img) => {
+    const color = TYPE_BADGE[img.image_type] || "#374151";
+    const isPending = img.status === "pending" || img.status === "approved";
+    return `
+      <div class="img-card" data-id="${img.id}">
+        <div class="img-thumb">
+          <img src="${img.generated_url}" alt="${img.image_type}" loading="lazy" />
+          <span class="img-type-badge" style="background:${color}">${img.image_type}</span>
+        </div>
+        <div class="img-info">
+          <div class="img-handle">${img.product_handle}</div>
+          <div class="img-status ${img.status}">${img.status}</div>
+        </div>
+        <div class="img-actions">
+          ${isPending ? `<button class="approve-btn" data-id="${img.id}" type="button">Approve → Shopify</button>` : ""}
+          ${isPending ? `<button class="reject-btn" data-id="${img.id}" type="button">Reject</button>` : ""}
+          ${img.status === "uploaded" ? `<span class="img-uploaded">✓ On Shopify</span>` : ""}
+          ${img.status === "rejected" ? `<span class="img-rejected">Rejected</span>` : ""}
+        </div>
+      </div>
+    `;
+  }).join("");
+
+  els.imageGrid.querySelectorAll(".approve-btn").forEach((btn) => {
+    btn.addEventListener("click", () => approveImage(btn.dataset.id));
+  });
+  els.imageGrid.querySelectorAll(".reject-btn").forEach((btn) => {
+    btn.addEventListener("click", () => rejectImage(btn.dataset.id));
+  });
+}
+
+async function approveImage(id) {
+  const btn = els.imageGrid.querySelector(`.approve-btn[data-id="${id}"]`);
+  if (btn) { btn.disabled = true; btn.textContent = "Uploading..."; }
+  try {
+    await api(`/images/${id}/approve`, { method: "PATCH" });
+    await refreshImages();
+  } catch (err) {
+    if (btn) { btn.disabled = false; btn.textContent = "Approve → Shopify"; }
+    alert(`Upload failed: ${err.message}`);
+  }
+}
+
+async function rejectImage(id) {
+  await api(`/images/${id}/reject`, { method: "PATCH" });
+  await refreshImages();
+}
+
+async function refreshImages() {
+  if (!state.apiKey) return;
+  const qs = state.imageStatus ? `?status=${state.imageStatus}` : "";
+  state.images = await api(`/images${qs}`).then((r) => r.data);
+  renderImages();
+}
+
 async function refreshAll() {
   if (!state.apiKey) {
     els.healthText.textContent = "Enter the admin key to load dashboard data.";
     return;
   }
 
-  const [health, overview, posts, scheduler, integrations] = await Promise.all([
+  const [health, overview, posts, scheduler, integrations, images] = await Promise.all([
     fetch("/health").then((r) => r.json()),
     api("/admin/overview").then((r) => r.data),
     api(`/posts${state.status ? `?status=${state.status}` : ""}`).then((r) => r.data),
     api("/admin/scheduler").then((r) => r.data),
-    api("/admin/integrations").then((r) => r.data)
+    api("/admin/integrations").then((r) => r.data),
+    api(`/images${state.imageStatus ? `?status=${state.imageStatus}` : ""}`).then((r) => r.data)
   ]);
 
   els.healthText.textContent = `API ${health.status}, DB ${health.database}`;
@@ -274,12 +343,14 @@ async function refreshAll() {
   state.posts = posts;
   state.scheduler = scheduler;
   state.integrations = integrations;
+  state.images = images;
   renderMetrics();
   renderCharts();
   renderPosts();
   renderEvents();
   renderScheduler();
   renderIntegrations();
+  renderImages();
 }
 
 els.apiKeyInput.value = state.apiKey;
@@ -297,6 +368,52 @@ document.querySelectorAll(".filter-button").forEach((button) => {
     button.classList.add("active");
     state.status = button.dataset.status || "";
     await refreshAll();
+  });
+});
+
+document.querySelector("#generatePostsBtn").addEventListener("click", async () => {
+  const productId = document.querySelector("#generateProductId").value.trim();
+  if (!productId) { alert("Enter a Shopify product ID first"); return; }
+  const btn = document.querySelector("#generatePostsBtn");
+  btn.disabled = true;
+  btn.textContent = "Generating…";
+  try {
+    await api(`/admin/products/${productId}/reset`, { method: "POST" });
+    await api("/admin/worker/run", { method: "POST", body: JSON.stringify({ batch_size: 1 }) });
+    alert("Posts generated. Check Generated Posts section.");
+    await refreshAll();
+  } catch (err) {
+    alert(`Failed: ${err.message}`);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Generate Posts";
+  }
+});
+
+document.querySelector("#generateImagesBtn").addEventListener("click", async () => {
+  const productId = document.querySelector("#generateProductId").value.trim();
+  if (!productId) return;
+  const btn = document.querySelector("#generateImagesBtn");
+  btn.disabled = true;
+  btn.textContent = "Generating… (takes ~60s)";
+  try {
+    const result = await api("/images/generate", { method: "POST", body: JSON.stringify({ productId }) });
+    alert(`Done: ${result.generated} of ${result.total} images generated. ${result.message || ""}`);
+    await refreshImages();
+  } catch (err) {
+    alert(`Generation failed: ${err.message}`);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Generate Images";
+  }
+});
+
+document.querySelectorAll(".img-filter").forEach((btn) => {
+  btn.addEventListener("click", async () => {
+    document.querySelectorAll(".img-filter").forEach((b) => b.classList.remove("active"));
+    btn.classList.add("active");
+    state.imageStatus = btn.dataset.imgStatus || "";
+    await refreshImages();
   });
 });
 

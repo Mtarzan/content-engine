@@ -11,6 +11,7 @@ import { logger } from "./config/logger.js";
 import { requireAdminApiKey } from "./middleware/adminAuth.js";
 import { adminRouter } from "./modules/admin/admin.routes.js";
 import { prisma } from "./modules/db/prisma.js";
+import { imagesRouter } from "./modules/images/images.routes.js";
 import { postsRouter } from "./modules/posts/posts.routes.js";
 import { trackingRouter } from "./modules/tracking/tracking.routes.js";
 import { shopifyWebhookRouter } from "./modules/webhooks/shopify.webhooks.js";
@@ -78,6 +79,7 @@ export function createApp() {
   app.use(trackingRouter);
   app.use("/admin", requireAdminApiKey, adminRouter);
   app.use("/posts", requireAdminApiKey, postsRouter);
+  app.use("/images", requireAdminApiKey, imagesRouter);
 
   app.use((_req, res) => {
     res.status(404).json({ error: "Not found" });

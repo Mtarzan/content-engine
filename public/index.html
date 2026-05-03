@@ -85,6 +85,25 @@
           <div id="eventsList" class="events-list"></div>
         </aside>
       </section>
+
+      <section class="panel images-panel">
+        <div class="panel-head">
+          <h2>Product Images</h2>
+          <span id="imageCount"></span>
+          <div class="generate-form">
+            <input id="generateProductId" type="text" placeholder="Shopify product ID" autocomplete="off" />
+            <button id="generateImagesBtn" type="button">Generate Images</button>
+            <button id="generatePostsBtn" type="button" style="background:var(--accent);">Generate Posts</button>
+          </div>
+          <div class="image-filters">
+            <button class="img-filter active" data-img-status="pending">Pending</button>
+            <button class="img-filter" data-img-status="uploaded">Uploaded</button>
+            <button class="img-filter" data-img-status="rejected">Rejected</button>
+            <button class="img-filter" data-img-status="">All</button>
+          </div>
+        </div>
+        <div id="imageGrid" class="image-grid"></div>
+      </section>
     </main>
 
     <dialog id="editDialog">
